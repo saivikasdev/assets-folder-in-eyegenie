@@ -1,0 +1,67 @@
+{% extends 'layout.html' %} 
+
+
+{% block title%}
+Edit Test
+{% endblock %}
+
+{% block content %}
+<div class="row">
+   <div class="col">
+      {% if errors['any()'] %}
+      <div class="alert alert-danger">
+         <ul>
+                           {% for error in errors['all()'] %}
+            <li>{{ error }}</li>
+            {% endfor %}
+         </ul>
+      </div>
+      {% endif %}
+     session('success')
+      <div class="alert alert-success">
+         {{ session('success')}}
+      </div>
+      {% endif %}
+   </div>
+</div>
+<div class="row justify-content-center">
+   <div class="col-md-8">
+      <div class="card shadow mb-4">
+         <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Edit Test</h6>
+         </div>
+         <div class="card-body">
+            <form method="post" action="/test.store_edit">
+               <div class="form-group row">
+                  <label for="inputEmail3" class="col-sm-3 col-form-label">Test Name<font color="red">*</font></label>
+                  <div class="col-sm-9">
+                     <input type="text" class="form-control" id="inputEmail3" name="test_name" value="{{ test['test_name'] }}">
+                     {{ csrf_field() }}
+                  </div>
+               </div>
+               <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-3 col-form-label">Description</label>
+                  <div class="col-sm-9">
+                     <input type="text" class="form-control" id="inputPassword3" name="comment" value="{{ test['comment'] }}">
+                     <input type="hidden" name="test_id" value="{{ test['id'] }}">
+                  </div>
+               </div>
+               <div class="form-group row">
+                  <div class="col-sm-9">
+                     <button type="submit" class="btn btn-primary">Save</button>
+                  </div>
+               </div>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>
+{% endblock %}
+
+@section('header')
+
+{% endblock %}
+
+@section('footer')
+
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends 'layout.html' %} 
+
+
+{% block title%}
+View billing
+{% endblock %}
+
+{% block content %}
+<div class="row">
+   <div class="col">
+      {% if errors['any()'] %}
+      <div class="alert alert-danger">
+         <ul>
+               {% for error in errors['all()'] %}
+            <li>{{ error }}</li>
+            {% endfor %}
+         </ul>
+      </div>
+      {% endif %}
+      {% if session('success') %}
+      <div class="alert alert-success">
+         {{ success }}
+      </div>
+      {% endif %}
+   </div>
+</div>
+<div class="row justify-content-center">
+   <div class="col">
+      <div class="card shadow mb-4">
+         <div class="card-body">
+            <!-- ROW : Doctor informations -->
+            <div class="row">
+               <div class="col">
+                  {!! clean(App\Setting::get_option('header_left')) !!}
+               </div>
+               <div class="col-md-3">
+                  <p><b>Date :</b> {{ $billing->created_at->format('d-m-Y')}}<br>
+                     <b>Reference :</b> {{ billing['reference'] }}<br>
+                     <b>Patient Name :</b> {{ billing['User'['name']] }}
+                  </p>
+               </div>
+            </div>
+            <!-- END ROW : Doctor informations -->
+            <!-- ROW : Drugs List -->
+            <div class="row justify-content-center">
+               <div class="col">
+                  <h5 class="text-center"><b>Invoice</b></h5>
+                  <br><br>
+                  <table class="table">
+                     <tr>
+                        <td width="10%">#</td>
+                        <td width="60%">Item</td>
+                        <td width="30%" align="center">Amount</td>
+                     </tr>
+                     @forelse ($billing_items as $key => $billing_item)
+                     <tr>
+                        <td>{{ key+1 }}</td>
+                        <td>{{ billing_item['invoice_title'] }}</td>
+                        <td align="center">{{ billing_item['invoice_amount'] }} {{ App\Setting::get_option('currency')}}</td>
+                     </tr>
+                     @empty
+                     <tr>
+                        <td colspan="3">Empty Invoice</td>
+                     </tr>
+                     @endforelse
+                     @empty(!$billing_item)
+                     {% if App\Setting::get_option('vat') > 0 %}
+                     <tr>
+                        <td colspan="2"><strong>Sub-Total</strong></td>
+                        <td align="center"><strong>{{ billing_items ['sum('invoice_amount  {{ App\Setting::get_option('currency')']}}</strong></td>
+                     </tr>
+                     <tr>
+                        <td colspan="2"><strong>VAT</strong></td>
+                        <td align="center"><strong> {{ App\Setting::get_option('vat%')}}</strong></td>
+                     </tr>
+                     {% endif %}
+                     <tr>
+                        <td colspan="2"><strong>Total</strong></td>
+                        <td align="center"><strong>{{ $billing_items->['sum('invoice_amount')'] + ($billing_items->['sum('invoice_amount')'] * App\Setting::get_option('vat')/100) }}  {{ App\Setting::get_option('currency</strong></td>
+                     </tr>
+                     @endempty
+                  </table>
+                  <hr>
+               </div>
+            </div>
+            <!-- ROW : Drugs List -->
+            <div class="row justify-content-center">
+               <div class="col">
+                  <hr>
+               </div>
+            </div>
+            <!-- END ROW : Drugs List -->
+            <!-- ROW : Footer informations -->
+            <div class="row">
+               <div class="col">
+                  <p>{!! clean(App\Setting::get_option('footer_left')) !!}</p>
+               </div>
+               <div class="col">
+                  <p class="float-right">{!! clean(App\Setting::get_option('footer_right')) !!}</p>
+               </div>
+            </div>
+            <!-- END ROW : Footer informations -->
+         </div>
+      </div>
+   </div>
+</div>
+{% endblock %}
+
+@section('footer')
+
+{% endblock %}

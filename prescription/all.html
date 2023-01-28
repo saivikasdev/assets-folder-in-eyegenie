@@ -1,0 +1,65 @@
+{% extends 'layout.html' %} 
+
+
+{% block title%}
+All Prescriptions
+{% endblock %}
+
+{% block content %}
+
+{% if error %}
+<div class="alert alert-danger">
+   <ul>
+      <li>{{ error }}</li>
+   </ul>
+</div>
+{% endif %}
+{% if success %}
+<div class="alert alert-success">
+   {{ success }}
+</div>
+{% endif %}
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+   <div class="card-header py-3">
+      <div class="row">
+         <div class="col-8">
+            <h6 class="m-0 font-weight-bold text-primary w-75 p-2">All Prescriptions</h6>
+         </div>
+         <div class="col-4">
+            <a href="/prescription.create" class="btn btn-primary float-right"><i class="fa fa-plus"></i> New Prescription</a>
+         </div>
+      </div>
+   </div>
+   <div class="card-body">
+      <div class="table-responsive">
+         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+            <thead>
+               <tr>
+                  <th>ID</th>
+                  <th>Patient</th>
+                  <th class="text-center">Date</th>
+                  <th class="text-center">Content</th>
+                  <th class="text-center">Actions</th>
+               </tr>
+            </thead>
+            <tbody>
+               {% for prescription in prescriptions %}
+               <tr>
+                  <td>{{ $prescription->id }}</td>
+                  <td><a href="{{ patient/view/{{prescription['user_id']}}) }}"> {{ prescription['User['name']'] }} </a></td>
+                  <td class="text-center">{{ prescription['created_at['format('d M Y H:i')']']}}</td>
+                  <td class="text-center"> {{ count(prescription['Drug']) }} Drugs | {{ count(prescription['Test']) }} Tests </td>
+                  <td class="text-center">
+                     <a href="{{prescription/view/{{prescription['id']}}) }}" class="btn btn-success btn-circle btn-sm"><i class="fa fa-eye"></i></a>
+                     <a href="{{prescription/pdf/{{prescription['id']}}) }}" class="btn btn-primary btn-circle btn-sm"><i class="fas fa-print"></i></a>
+                     <a href="{{prescription/delete/{{prescription['id']}}) }}" class="btn btn-danger btn-circle btn-sm"><i class="fas fa-trash"></i></a>
+                  </td>
+               </tr>
+               {% endfor %}
+            </tbody>
+         </table>
+      </div>
+   </div>
+</div>
+{% endblock %}

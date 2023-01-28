@@ -1,0 +1,537 @@
+{% extends 'layout.html' %} 
+
+
+{% block title%}
+Create new session
+{% endblock %}
+
+{% block content %}
+<div class="row">
+   <div class="col">
+      {% if errors['any()'] %}
+      <div class="alert alert-danger">
+         <ul>
+                           {% for error in errors['all()'] %}
+            <li>{{ error }}</li>
+            {% endfor %}
+         </ul>
+      </div>
+      {% endif %}
+     session('success')
+      <div class="alert alert-success">
+         {{ session('success
+      </div>
+      {% endif %}
+   </div>
+</div>
+<div class="row justify-content-center">
+   <div class="col-md-10" >
+      <div class="card shadow mb-4" style='min-height : 90vh'>
+         <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">New Session</h6>
+         </div>
+         <div class="card-body ">
+
+
+            <section id="patient_dropdown">
+               <img src="/img/new.png" class='mx-auto form-image'>
+               <h6>Select Patient</h6>
+               <div class="row">
+                  <div class="col-md-6 col-sm-12">
+                     <div class="form-group">
+                        <!-- <label for="exampleInputEmail1">Patient </label> -->
+                        <select class="form-control patient_name"  id="patient_name">
+                           <option value="">Select Patient</option>
+                           {% for patient in patients %}
+                           <option value="{{ $patient->id }}">{{ patient['name'] }}</option>
+                           {% endfor %}
+                        </select>
+                     </div>
+                     <div class="form-group">
+                           <button onclick="startSession()" class="btn btn-primary">Start Session</button>
+                     </div>
+                  </div>
+            </section>
+
+                  <div class='col-md-4 display-none' id="zoom-section">  
+                        <div>
+                           <button class='btn btn-primary' id='create_meeting'>Start Zoom Call</button>
+
+                           <button class='btn btn-danger' style='display:none' id='stop_meeting'>Stop Session</button>
+                        </div>
+                  </div>
+                  
+                  <div class='col-12 display-none' >
+                  
+                     <iframe frameBorder='0' src='' id="zoomlink"></iframe>
+
+                  </div>
+                  <div class="col-12 display-none">
+                        <p id='current_session'></p>
+                        <form id='image_form' action="/image.upload.post" method="POST" enctype="multipart/form-data">
+
+                              <div class="input-group" id='file_upload' style='display:none'>
+
+                                    <div class="input-group-prepend">
+                                       <span class="input-group-text" id="inputGroupFileAddon01">Upload photos</span>
+                                    </div>
+                                    <div class="custom-file">
+                                       <input type="file" name='image' class="custom-file-input" id="inputGroupFile01"
+                                          aria-describedby="inputGroupFileAddon01">
+                                       <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                                    </div>
+                              </div>
+                        </form>
+
+                        <div id='updated_images'>
+                        </div>
+                  </div>
+
+                  <hr>
+                        <form id="details_form" class="display-none" method="POST" >
+                        <h6 class="mx-2">Patient Data</h6>
+
+                           <!-- section 1 -->
+                           <section class=' my-4 border rounded bg-light p-2 py-4 border-4'>
+                           <h5>Diagnostics</h5>
+                              <img src="/img/refractive.png" class='form-image'>
+
+                              <div class="form-group mt-4">
+                                 <label for="f1">Visual acuity (LE) <span class='text-danger'>*</span></label>
+                                 <select name="f1" id='f1'  class="custom-select  answer">
+                                       <option value="">Choose</option>
+                                       { % for item in VisualAcuityLE % }
+
+                                          <option>{{ item }}</option>
+                        
+                                       {% endfor %}
+                                 </select>
+                                 <small id="f1_error" class="display-none m-2 form-text text-danger error-message"><i class=" fa fa-solid fa-exclamation-circle mx-1"></i> This is a required field</small>
+                              </div>
+
+                              <div class="form-group mt-4">
+                                 <label for="f2">Visual acuity (RE) <span class='text-danger'>*</span></label>
+                                 <select name="f2" id='f2'  class="custom-select answer">
+                                    <option value="">Choose</option>
+                                    { % for item in VisualAcuityRE % }
+
+                                       <option>{{ item }}</option>
+                     
+                                    {% endfor %}
+                                 </select>
+                                 <small id="f2_error" class="display-none m-2 form-text text-danger error-message"><i class=" fa fa-solid fa-exclamation-circle mx-1"></i> This is a required field</small>
+                              </div>
+                           </section>
+
+
+                           <!-- section 2 -->
+                           <section class='my-4 border rounded bg-light p-2 py-4 border-4'>
+                              <h5>Intraocular pressure  (IOP)</h5>
+                              <img src="/img/IOP.png" class='form-image'>
+
+                              <div class="form-group mt-4">
+                                 <label for="f3">LEFT EYE (IOP) <span class='text-danger'>*</span></label>
+                                 <input name='f3' id='f3' class='form-control answer' placeholder='Enter your answer'>
+                                 <small id="f3_error" class="display-none m-2 form-text text-danger error-message"><i class=" fa fa-solid fa-exclamation-circle mx-1"></i> This is a required field</small>
+                              </div>
+
+                              <div class="form-group mt-4">
+                                 <label for="f4">RIGHT EYE (IOP) <span class='text-danger'>*</span></label>
+                                 <input name='f4' id='f4' class='form-control answer' placeholder='Enter your answer'>
+                                 <small id="f4_error" class="display-none m-2 form-text text-danger error-message"><i class=" fa fa-solid fa-exclamation-circle mx-1"></i> This is a required field</small>
+                              </div>
+                           </section>
+
+
+                              <!-- section 3 -->
+                           <section class='my-4 border rounded bg-light p-2 py-4 border-4'>
+                              <h5>REFRACTIVE (LE)</h5>
+                              <img src="/img/LE_regraction.jpg" class='form-image'>
+
+                              <div class="form-group mt-4">
+                                 <label for="f5">Sphere (SPH) LE <span class='text-danger'>*</span></label>
+                                 <select name="f5" id='f5'  class="custom-select answer">
+                                       <option value="">Choose</option>
+                                       { % for item in SphLE % }
+
+                                          <option>{{ item }}</option>
+                        
+                                       {% endfor %}
+                                 </select>
+                                 <small id="f5_error" class="display-none m-2 form-text text-danger error-message"><i class=" fa fa-solid fa-exclamation-circle mx-1"></i> This is a required field</small>
+                              </div>
+
+                              <div class="form-group mt-4">
+                                 <label for="f6">Cylinder (CYL) LE <span class='text-danger'>*</span></label>
+                                 <select name="f6" id='f6'  class="custom-select answer">
+                                       <option value="">Choose</option>
+                                       { % for item in CylLE % }
+
+                                          <option>{{ item }}</option>
+                        
+                                       {% endfor %}
+                                 </select>
+                                 <small id="f6_error" class="display-none m-2 form-text text-danger error-message"><i class=" fa fa-solid fa-exclamation-circle mx-1"></i> This is a required field</small>
+                              </div>
+
+                              <div class="form-group mt-4">
+                                 <label for="f7">AXIS - LE <span class='text-danger'>*</span></label>
+                                 <select name="f7" id='f7'  class="custom-select answer">
+                                       <option value="">Choose</option>
+                                       { % for item in AXIS % }
+
+                                          <option>{{ item }}</option>
+                        
+                                       {% endfor %}
+                                 </select>                           
+                                 <small id="f7_error" class="display-none m-2 form-text text-danger error-message"><i class=" fa fa-solid fa-exclamation-circle mx-1"></i> This is a required field</small>
+                              </div>
+                           </section>
+
+
+                           <!-- section 4 -->
+                           <section class='my-4 border rounded bg-light p-2 py-4 border-4'>
+                              <h5>REFRACTIVE (RE)</h5>
+                              <img src="/img/RE_regraction.jpg" class='form-image'>
+
+                              <div class="form-group mt-4">
+                                 <label for="f8">Sphere (SPH) RE <span class='text-danger'>*</span></label>
+                                 
+                                 <select name="f8" id='f8'  class="custom-select answer">
+                                 <option value="">Choose</option>
+                                    { % for item in SphLE % }
+
+                                       <option>{{ item }}</option>
+                     
+                                    {% endfor %}
+                                 </select>
+                                 <small id="f8_error" class="display-none m-2 form-text text-danger error-message"><i class=" fa fa-solid fa-exclamation-circle mx-1"></i> This is a required field</small>
+                              </div>
+
+                              <div class="form-group mt-4">
+                                 <label for="f9">Cylinder (CYL) RE <span class='text-danger'>*</span></label>
+                                 
+                                 <select name="f9" id="f9" class="custom-select answer">
+                                    <option value="">Choose</option>
+
+                                    { % for item in CylLE % }
+
+                                       <option>{{ item }}</option>
+                     
+                                    {% endfor %}
+                                 </select>
+                                 <small id="f9_error" class="display-none m-2 form-text text-danger error-message"><i class=" fa fa-solid fa-exclamation-circle mx-1"></i> This is a required field</small>
+                              </div>
+
+                              <div class="form-group mt-4">
+                                 <label for="f10">AXIS - RE <span class='text-danger'>*</span></label>
+                                 <select name="f10" id="f10" class="custom-select answer">
+                                    <option value="">Choose</option>
+
+                                    { % for item in AXIS % }
+
+                                       <option>{{ item }}</option>
+                     
+                                    {% endfor %}
+                                 </select>                           
+                                 <small id="f10_error" class="display-none m-2 form-text text-danger error-message"><i class=" fa fa-solid fa-exclamation-circle mx-1"></i> This is a required field</small>
+                              </div>
+                           </section>
+
+
+                           <!-- section 5 -->
+                           <section class='my-4 border rounded bg-light p-2 py-4 border-4'>
+                           
+                              <div class="form-group mt-4">
+                                 <label for="f11">Best Corrected Visual Acuity (BCVA) LEFT EYE <span class='text-danger'>*</span></label>
+
+                                 <select name="f11" id="f11"  class="custom-select answer">
+                                    <option value="">Choose</option>
+                                    { % for item in BcvaLE % }
+
+                                       <option>{{ $item }}</option>
+                     
+                                    {% endfor %}
+                                 </select>
+                                 <small id="f11_error" class="display-none m-2 form-text text-danger error-message"><i class=" fa fa-solid fa-exclamation-circle mx-1"></i> This is a required field</small>
+                              </div>
+
+                           </section>
+                     
+                           <!-- section 6 -->
+                           <section class='my-4 border rounded bg-light p-2 py-4 border-4'>
+                              <div class="form-group mt-4">
+                                 <label for="f12">Best Corrected Visual Acuity (BCVA) RIGHT EYE <span class='text-danger'>*</span></label>
+
+                                 <select name="f12" id="f12"  class="custom-select answer">
+                                    <option value="">Choose</option>
+
+                                    { % for item in BcvaRE % }
+
+                                       <option>{{ item }}</option>
+                     
+                                    {% endfor %}
+                                 </select>
+                                 <small id="f12_error" class="display-none m-2 form-text text-danger error-message"><i class=" fa fa-solid fa-exclamation-circle mx-1"></i> This is a required field</small>
+                              </div>
+                           </section>
+
+                           <button type="submit" class="btn btn-primary">Submit</button><br>
+                           <small id='error-info' class=" text-danger display-none mx-2">Please enter all the required fields</small>
+                        </form>
+                     
+
+                     
+                  </div>
+                  
+                  
+               </div>
+            </section>
+         </div>
+      </div>
+   </div>
+</div>
+<!-- Appointment Modal-->
+<div class="modal fade" id="RDVModalSubmit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+   <div class="modal-dialog" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Are you sure of the date</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <p><b>Patient :</b> <span id="patient_name"></span></p>
+            <p><b>Date :</b> <span id="rdv_date"></span></p>
+            <p><b>Time Slot :</b> <span id="rdv_time"></span></p>
+         </div>
+         <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+            <a class="btn btn-primary text-white"
+               onclick="event.preventDefault();
+               document.getElementById('rdv-form').submit();">Save</a>
+            <form id="rdv-form" action="/appointment.store" method="POST" class="d-none">
+               <input type="hidden" name="patient" id="patient_input">
+               <input type="hidden" name="rdv_time_date" id="rdv_date_input">
+               <input type="hidden" name="rdv_time_start" id="rdv_time_start_input">
+               <input type="hidden" name="rdv_time_end" id="rdv_time_end_input">
+               @csrf
+            </form>
+         </div>
+      </div>
+   </div>
+</div>
+{% endblock %}
+
+@section('header')
+
+{% endblock %}
+
+@section('footer')
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<script>
+
+   
+   function validateForm(){
+      var isValidated = true;
+
+      var res = {
+
+      }
+      $("#details_form").find(".form-group").each(function(){
+
+         console.log("===================")
+         let ques = $(this).find('label').text();
+         let answ = $(this).find('.answer').val();
+
+         if(answ == ""){
+            $(this).find(".error-message").fadeIn()
+            $(this).find('.answer').addClass("border border-danger");
+            isValidated = false;
+
+         }else{
+            $(this).find(".error-message").fadeOut()
+            $(this).find('.answer').removeClass("border border-danger");
+         }
+         console.log("ques: " + ques)
+         console.log("answ: " + answ)
+         res[ques] = answ
+      })
+
+      return [isValidated, res];     
+      
+   }
+
+
+   function disableForms(){
+      $("#details_form *").attr("disabled", true).off('click');
+      $("#details_form").css("opacity", 0.5)
+   }
+   function enableForms(){
+      $("#details_form *").attr("disabled", false)
+      $("#details_form").css("opacity", 1)
+   }
+   
+
+   $(document).ready(function(){
+
+      disableForms();
+
+      $(".answer").on("change", function(){
+         if($(this).val() != ""){
+            $(this).removeClass("border border-danger");
+            $(this).next().fadeOut()
+         }else{
+            $(this).addClass("border border-danger");
+            $(this).next().show()
+         }
+      })
+
+      $("#details_form").submit(function(){
+        let result =  validateForm()
+         let details = result[1]
+        if(result[0] == true){
+            console.log(details)
+            $("#error-info").fadeOut()
+
+            //api call
+
+        }else{
+         $("#error-info").fadeIn()
+        }
+         
+
+         
+
+         return false;
+      })
+
+      $("#create_meeting").click(function(){
+         
+         $.ajax({
+         headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+         url : "/meeting/create",
+         method : "POST",
+         data : {
+            topic : "Test 134",
+            "start_time" : "11-12-2022 15:30:00",
+            "duration" : "60",
+            "agenda" : "Agenda",
+            "host_video" : "1",
+            "participant_video" : "1"
+         },
+         success:  function(data){
+            console.log(data);
+            window.open(data['data']['start_url'], 'EyeGenie', 'width=500,height=500');
+  
+            $("#patient_name").prop("disabled", true);  
+
+            $("#patient_name").hide();
+
+            $("#file_upload").show();
+
+            var name = $( "#patient_name option:selected" ).text();
+            $("#current_session").html(`<h4>Session started for ${name}</h4>`)
+
+         $("#create_meeting").hide()
+         $("#stop_meeting").show()
+
+            // $("#zoomlink").attr("src","https://us04web.zoom.us/wc/76560801984/start")
+         }
+      });
+      });
+
+      $("#inputGroupFile01").on("change", function(){;
+         $("#image_form").submit();
+
+      })
+
+
+      $("#image_form").on('submit', function(e){
+         console.log("===================SUBMITTING")
+        e.preventDefault();
+        $.ajax({
+         headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            type: 'POST',
+            url: '/image-upload',
+            data: new FormData(this),
+            dataType: 'json',
+            contentType: false,
+            cache: false,
+            processData:false,
+           
+            success: function(response){
+                  console.log(response); 
+                  $("#updated_images").append(`<img src='${response["data"]}'>`)     
+
+            }
+        });
+        return false;
+
+    });
+
+
+      $("#stop_meeting").click(function(){
+
+         $("#patient_name").prop("disabled", false);  
+
+            $("#patient_name").show()
+
+            $("#file_upload").hide();
+
+            // var name = $( "#patient_name option:selected" ).text();
+            // $("#current_session").html(`<h4>Session started for ${name}</h4>`)
+            $("#current_session").hide();
+         $("#create_meeting").show()
+         $("#stop_meeting").hide()
+      })
+      
+   });
+$("select[id='patient_name']").on('change', function()
+{
+
+   var patient_id = document.getElementById("patient_name").value;
+   // if(patient_id != ""){
+      // enableForms()
+   // }else{
+      // disableForms()
+   // }
+})
+
+function startSession(){
+   
+  
+
+   swal({
+      title: "Starting new session",
+      text: "",
+      // icon: "info",
+      // button: "Okay",
+      showConfirmButton : false
+   }).then(function(){
+      $("#patient_dropdown").hide();
+   $("#details_form").show()
+   $("#zoom-section").show()
+
+
+   enableForms();
+   });
+}
+
+
+
+const onConfirmRefresh = function (event) {
+  event.preventDefault();
+  return event.returnValue = "Are you sure you want to leave the page?";
+}
+
+// window.addEventListener("beforeunload", onConfirmRefresh, { capture: true });
+</script>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'layout.html' %} 
+
+
+{% block title%}
+All Tests
+{% endblock %}
+
+{% block content %}
+{% if error %}
+<div class="alert alert-danger">
+   <ul>
+      <li>{{ error }}</li>
+   </ul>
+</div>
+{% endif %}
+{% if success %}
+<div class="alert alert-success">
+   {{ success }}
+</div>
+{% endif %}
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+   <div class="card-header py-3">
+      <div class="row">
+         <div class="col-8">
+            <h6 class="m-0 font-weight-bold text-primary w-75 p-2">All Tests</h6>
+         </div>
+         <div class="col-4">
+            <a href="/test/create" class="btn btn-primary float-right"><i class="fa fa-plus"></i> Add Test</a>
+         </div>
+      </div>
+   </div>
+   <div class="card-body">
+      <div class="table-responsive">
+         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+            <thead>
+               <tr>
+                  <th>ID</th>
+                  <th>Test Name</th>
+                  <th>Description</th>
+                  <th class="text-center">Actions</th>
+               </tr>
+            </thead>
+            <tbody>
+               { % for test in tests % }
+
+               <tr>
+                  <td>{{ $test->id }}</td>
+                  <td>{{ $test->test_name }}</td>
+                  <td> {{ $test->comment }} </td>
+                  <td class="text-center">
+                     <a href="{{test/edit/{{test['id']}} }}" class="btn btn-warning btn-circle btn-sm"><i class="fa fa-pen"></i></a>
+                     <a href="{{ test/delete/{{test['id']}} }}" class="btn btn-danger btn-circle btn-sm"><i class="fa fa-trash"></i></a>
+                  </td>
+               </tr>
+               {% endfor %}
+            </tbody>
+         </table>
+      </div>
+   </div>
+</div>
+{% endblock %}
